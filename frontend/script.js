@@ -67,7 +67,11 @@ function renderError(message) {
 async function fetchLatestReading() {
   try {
     setStatus("Refreshing...");
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {
+      headers: {
+        "ngrok-skip-browser-warning": "true"
+      }
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
