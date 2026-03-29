@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT Health Monitor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="dashboard-card">
+      <div class="card-header">
+        <div>
+          <p class="eyebrow">Live Monitor</p>
+          <h1>Patient Health Snapshot</h1>
+        </div>
+        <p id="status" class="status-pill">Loading...</p>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <span class="metric-label">SpO2</span>
+          <strong id="spo2">--</strong>
+          <small>%</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Heart Rate</span>
+          <strong id="heartRate">--</strong>
+          <small>bpm</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">Temperature</span>
+          <strong id="temperature">--</strong>
+          <small>C</small>
+        </article>
+      </div>
+
+      <div class="details-grid">
+        <article class="info-card">
+          <h2>Risk Level</h2>
+          <p id="riskLevel">--</p>
+        </article>
+        <article class="info-card">
+          <h2>Conditions</h2>
+          <ul id="conditions" class="conditions-list">
+            <li>No data yet.</li>
+          </ul>
+        </article>
+      </div>
+
+      <article class="info-card explanation-card">
+        <h2>Explanation</h2>
+        <p id="explanation">Waiting for latest prediction...</p>
+      </article>
+
+      <p id="updatedAt" class="updated-at">Last updated: --</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
