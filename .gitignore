@@ -1,5 +1,8 @@
 backend/.env
 backend_stdout.log
 backend_stderr.log
+ngrok_stdout.log
+ngrok_stderr.log
+tools/ngrok/
 __pycache__/
 *.pyc
