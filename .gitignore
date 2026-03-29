@@ -1,0 +1,5 @@
+backend/.env
+backend_stdout.log
+backend_stderr.log
+__pycache__/
+*.pyc
