@@ -23,11 +23,3 @@ This project uses an ESP32 with `MAX30102` and `DS18B20` sensors to capture SpO2
 - Implemented a responsive web dashboard and a GitHub Pages + ngrok demo deployment workflow for public project showcasing.
 - Integrated embedded firmware with cloud-style backend services to stream sensor readings every 10 seconds over Wi-Fi.
 
-## Interview Talking Points
-- Why FastAPI was a good fit for a lightweight sensor-ingestion API
-- How structured AI output reduced brittle parsing logic
-- Why local backend + GitHub Pages + ngrok is a practical free demo deployment
-- What would change for production: auth, HTTPS, managed DB, queueing, monitoring, and better device security
-
-## Suggested Portfolio Caption
-A full-stack IoT health monitoring demo that combines embedded systems, API engineering, database design, AI-assisted assessment, and a live frontend dashboard.
