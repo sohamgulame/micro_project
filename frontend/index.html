@@ -8,52 +8,118 @@
 </head>
 <body>
   <main class="page">
-    <section class="dashboard-card">
+    <section class="auth-card" id="authSection">
+      <div class="auth-header">
+        <p class="eyebrow">Secure Access</p>
+        <h1>IoT Health Monitor</h1>
+        <p class="subtext">Sign up or log in to view your personal readings and prediction history.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="showLoginBtn" class="tab-btn active" type="button">Login</button>
+        <button id="showSignupBtn" class="tab-btn" type="button">Sign Up</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <label>Email</label>
+        <input id="loginEmail" type="email" required />
+        <label>Password</label>
+        <input id="loginPassword" type="password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      <form id="signupForm" class="auth-form hidden">
+        <label>Full Name</label>
+        <input id="signupName" type="text" required />
+        <label>Email</label>
+        <input id="signupEmail" type="email" required />
+        <label>Password</label>
+        <input id="signupPassword" type="password" minlength="6" required />
+        <button type="submit">Create Account</button>
+      </form>
+
+      <p id="authMessage" class="auth-message"></p>
+    </section>
+
+    <section class="dashboard-card hidden" id="appSection">
       <div class="card-header">
         <div>
           <p class="eyebrow">Live Monitor</p>
           <h1>Patient Health Snapshot</h1>
+          <p class="subtext" id="userSummary"></p>
+          <p class="device-key" id="deviceKeyText"></p>
         </div>
-        <p id="status" class="status-pill">Loading...</p>
+        <div class="right-controls">
+          <p id="status" class="status-pill">Loading...</p>
+          <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+        </div>
       </div>
 
-      <div class="metrics-grid">
-        <article class="metric-card">
-          <span class="metric-label">SpO2</span>
-          <strong id="spo2">--</strong>
-          <small>%</small>
-        </article>
-        <article class="metric-card">
-          <span class="metric-label">Heart Rate</span>
-          <strong id="heartRate">--</strong>
-          <small>bpm</small>
-        </article>
-        <article class="metric-card">
-          <span class="metric-label">Temperature</span>
-          <strong id="temperature">--</strong>
-          <small>C</small>
-        </article>
+      <div class="view-tabs">
+        <button id="dashboardTabBtn" class="tab-btn active" type="button">Dashboard</button>
+        <button id="historyTabBtn" class="tab-btn" type="button">History</button>
       </div>
 
-      <div class="details-grid">
+      <section id="dashboardView">
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span class="metric-label">SpO2</span>
+            <strong id="spo2">--</strong>
+            <small>%</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Heart Rate</span>
+            <strong id="heartRate">--</strong>
+            <small>bpm</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Temperature</span>
+            <strong id="temperature">--</strong>
+            <small>C</small>
+          </article>
+        </div>
+
+        <div class="details-grid">
+          <article class="info-card">
+            <h2>Risk Level</h2>
+            <p id="riskLevel">--</p>
+          </article>
+          <article class="info-card">
+            <h2>Conditions</h2>
+            <ul id="conditions" class="conditions-list">
+              <li>No data yet.</li>
+            </ul>
+          </article>
+        </div>
+
+        <article class="info-card explanation-card">
+          <h2>Explanation</h2>
+          <p id="explanation">Waiting for latest prediction...</p>
+        </article>
+
+        <p id="updatedAt" class="updated-at">Last updated: --</p>
+      </section>
+
+      <section id="historyView" class="hidden">
         <article class="info-card">
-          <h2>Risk Level</h2>
-          <p id="riskLevel">--</p>
+          <h2>Your Reading History</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>SpO2</th>
+                  <th>Heart Rate</th>
+                  <th>Temp</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+          <p id="historyMessage" class="subtext"></p>
         </article>
-        <article class="info-card">
-          <h2>Conditions</h2>
-          <ul id="conditions" class="conditions-list">
-            <li>No data yet.</li>
-          </ul>
-        </article>
-      </div>
-
-      <article class="info-card explanation-card">
-        <h2>Explanation</h2>
-        <p id="explanation">Waiting for latest prediction...</p>
-      </article>
-
-      <p id="updatedAt" class="updated-at">Last updated: --</p>
+      </section>
     </section>
   </main>
 

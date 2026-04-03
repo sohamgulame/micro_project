@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -11,6 +11,7 @@ from app.models.reading_schema import (
     ReadingResponse,
 )
 from app.services.ai_service import AIService
+from app.services.auth_service import AuthService, get_current_user, get_optional_current_user
 from app.services.reading_service import ReadingService
 
 router = APIRouter(prefix="/api/v1", tags=["Readings"])
@@ -36,12 +37,28 @@ def build_reading_response(reading: Reading) -> ReadingAnalysisResponse:
     summary="Create a new IoT health reading",
 )
 def create_reading(
-    payload: ReadingCreate, db: Session = Depends(get_db)
+    payload: ReadingCreate,
+    db: Session = Depends(get_db),
+    user=Depends(get_optional_current_user),
+    x_device_key: str | None = Header(default=None),
 ) -> ReadingAnalysisResponse:
-    reading = ReadingService.create_reading(db, payload)
+    resolved_user = user
+    if resolved_user is None and x_device_key:
+        resolved_user = AuthService.get_user_by_device_key(db, x_device_key)
+
+    reading = ReadingService.create_reading(
+        db,
+        payload,
+        user_id=resolved_user.id if resolved_user else None,
+    )
     analysis = AIService().analyze_health(payload)
     ReadingService.create_prediction(db, reading.id, analysis)
-    latest_reading = ReadingService.get_latest_reading(db)
+
+    if resolved_user:
+        latest_reading = ReadingService.get_latest_reading(db, resolved_user.id)
+    else:
+        latest_reading = reading
+
     if latest_reading is None:
         raise HTTPException(status_code=500, detail="Stored reading could not be loaded.")
     return build_reading_response(latest_reading)
@@ -52,10 +69,10 @@ def create_reading(
     response_model=ReadingAnalysisResponse,
     summary="Get the latest health reading with prediction",
 )
-def get_latest_reading(db: Session = Depends(get_db)) -> ReadingAnalysisResponse:
-    reading = ReadingService.get_latest_reading(db)
+def get_latest_reading(user=Depends(get_current_user), db: Session = Depends(get_db)) -> ReadingAnalysisResponse:
+    reading = ReadingService.get_latest_reading(db, user.id)
     if reading is None:
-        raise HTTPException(status_code=404, detail="No readings found.")
+        raise HTTPException(status_code=404, detail="No readings found for this user.")
     return build_reading_response(reading)
 
 
@@ -64,6 +81,6 @@ def get_latest_reading(db: Session = Depends(get_db)) -> ReadingAnalysisResponse
     response_model=HistoryResponse,
     summary="Get health reading history",
 )
-def get_reading_history(db: Session = Depends(get_db)) -> HistoryResponse:
-    readings = ReadingService.get_all_readings(db)
+def get_reading_history(user=Depends(get_current_user), db: Session = Depends(get_db)) -> HistoryResponse:
+    readings = ReadingService.get_all_readings(db, user.id)
     return HistoryResponse(readings=[build_reading_response(reading) for reading in readings])

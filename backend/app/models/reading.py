@@ -11,12 +11,16 @@ class Reading(Base):
     __tablename__ = "readings"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     spo2: Mapped[int] = mapped_column(Integer, nullable=False)
     heart_rate: Mapped[int] = mapped_column(Integer, nullable=False)
     temperature: Mapped[float] = mapped_column(Float, nullable=False)
     timestamp: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=func.now()
     )
+
     predictions: Mapped[list["Prediction"]] = relationship(
         back_populates="reading", cascade="all, delete-orphan"
     )
