@@ -6,10 +6,11 @@
 #include "MAX30105.h"
 #include "spo2_algorithm.h"
 
-const char* WIFI_SSID = "Galaxy M32";
-const char* WIFI_PASSWORD = "soham0905";
+const char* WIFI_SSID = "TP-Link_8114";
+const char* WIFI_PASSWORD = "17934602";
 
-const char* SERVER_URL = "http://192.168.0.101:8000/api/v1/readings";
+const char* SERVER_URL = "http://192.168.0.102:8000/api/v1/readings";
+
 
 const int ONE_WIRE_BUS = 4;
 const unsigned long POST_INTERVAL_MS = 10000;
