@@ -4,6 +4,3 @@ sqlalchemy
 pymysql
 cryptography
 google-genai
-passlib
-python-jose[cryptography]
-email-validator

@@ -12,8 +12,8 @@ class DatabaseOperationError(Exception):
 
 class ReadingService:
     @staticmethod
-    def create_reading(db: Session, payload: ReadingCreate, user_id: int | None = None) -> Reading:
-        reading = Reading(user_id=user_id, **payload.model_dump())
+    def create_reading(db: Session, payload: ReadingCreate) -> Reading:
+        reading = Reading(**payload.model_dump())
 
         try:
             db.add(reading)
@@ -45,21 +45,19 @@ class ReadingService:
             raise DatabaseOperationError("Failed to store prediction in the database.") from exc
 
     @staticmethod
-    def get_latest_reading(db: Session, user_id: int) -> Reading | None:
+    def get_latest_reading(db: Session) -> Reading | None:
         return (
             db.query(Reading)
             .options(selectinload(Reading.predictions))
-            .filter(Reading.user_id == user_id)
             .order_by(desc(Reading.timestamp), desc(Reading.id))
             .first()
         )
 
     @staticmethod
-    def get_all_readings(db: Session, user_id: int) -> list[Reading]:
+    def get_all_readings(db: Session) -> list[Reading]:
         return (
             db.query(Reading)
             .options(selectinload(Reading.predictions))
-            .filter(Reading.user_id == user_id)
             .order_by(desc(Reading.timestamp), desc(Reading.id))
             .all()
         )

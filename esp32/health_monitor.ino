@@ -10,8 +10,6 @@ const char* WIFI_SSID = "Galaxy M32";
 const char* WIFI_PASSWORD = "soham0905";
 
 const char* SERVER_URL = "http://192.168.0.101:8000/api/v1/readings";
-// Copy this from the web app after login: "Device Key: ..."
-const char* DEVICE_API_KEY = "PASTE_USER_DEVICE_KEY_HERE";
 
 const int ONE_WIRE_BUS = 4;
 const unsigned long POST_INTERVAL_MS = 10000;
@@ -140,7 +138,6 @@ void sendHealthReading() {
   HTTPClient http;
   http.begin(SERVER_URL);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("x-device-key", DEVICE_API_KEY);
 
   int httpResponseCode = http.POST(payload);
 
