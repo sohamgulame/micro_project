@@ -1,6 +1,33 @@
-const API_BASE_URL = window.APP_CONFIG?.apiBaseUrl || "http://127.0.0.1:8000";
-const API_PREFIX = API_BASE_URL.replace(/\/$/, "") + "/api/v1";
+const API_STORAGE_KEY = "api_base_url";
+const DEFAULT_API_BASE_URL = (window.APP_CONFIG?.apiBaseUrl || "http://127.0.0.1:8000").trim();
 const REFRESH_INTERVAL_MS = 5000;
+
+function normalizeApiBaseUrl(url) {
+  return String(url || "").trim().replace(/\/+$/, "");
+}
+
+function getQueryApiUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return normalizeApiBaseUrl(params.get("api") || params.get("apiBaseUrl") || "");
+}
+
+function getStoredApiUrl() {
+  return normalizeApiBaseUrl(localStorage.getItem(API_STORAGE_KEY));
+}
+
+function saveApiUrl(url) {
+  localStorage.setItem(API_STORAGE_KEY, normalizeApiBaseUrl(url));
+}
+
+let apiBaseUrl =
+  getStoredApiUrl() ||
+  getQueryApiUrl() ||
+  normalizeApiBaseUrl(DEFAULT_API_BASE_URL) ||
+  "http://127.0.0.1:8000";
+
+function getApiPrefix() {
+  return `${apiBaseUrl}/api/v1`;
+}
 
 const authSection = document.getElementById("authSection");
 const appSection = document.getElementById("appSection");
@@ -18,6 +45,9 @@ const userSummary = document.getElementById("userSummary");
 const deviceKeyText = document.getElementById("deviceKeyText");
 const historyTableBody = document.getElementById("historyTableBody");
 const historyMessage = document.getElementById("historyMessage");
+const apiBaseInput = document.getElementById("apiBaseInput");
+const saveApiBtn = document.getElementById("saveApiBtn");
+const currentApiUrl = document.getElementById("currentApiUrl");
 
 const elements = {
   status: document.getElementById("status"),
@@ -68,6 +98,11 @@ function setAuthMessage(message, isError = true) {
   authMessage.style.color = isError ? "#a53f3f" : "#1e7d58";
 }
 
+function updateApiUrlUi() {
+  apiBaseInput.value = apiBaseUrl;
+  currentApiUrl.textContent = `Current backend: ${apiBaseUrl}`;
+}
+
 function showLogin() {
   showLoginBtn.classList.add("active");
   showSignupBtn.classList.remove("active");
@@ -97,6 +132,8 @@ function showHistoryTab() {
 }
 
 function applyAuthState() {
+  updateApiUrlUi();
+
   const token = getToken();
   const user = getUser();
   if (!token || !user) {
@@ -135,14 +172,21 @@ async function apiRequest(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_PREFIX}${path}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${getApiPrefix()}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(
+      `Cannot reach backend at ${apiBaseUrl}. Start backend/ngrok and save the latest URL.`
+    );
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const message = errorData.detail || errorData.message || "Request failed.";
+    const message = errorData.detail || errorData.message || `Request failed (${response.status}).`;
     throw new Error(message);
   }
 
@@ -242,6 +286,24 @@ async function fetchHistory() {
   }
 }
 
+saveApiBtn.addEventListener("click", () => {
+  const nextUrl = normalizeApiBaseUrl(apiBaseInput.value);
+  if (!nextUrl) {
+    setAuthMessage("Enter a valid backend URL first.", true);
+    return;
+  }
+
+  apiBaseUrl = nextUrl;
+  saveApiUrl(nextUrl);
+  updateApiUrlUi();
+  setAuthMessage("Backend URL saved.", false);
+
+  if (getToken()) {
+    fetchLatestReading();
+    fetchHistory();
+  }
+});
+
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   setAuthMessage("");
@@ -305,4 +367,6 @@ logoutBtn.addEventListener("click", () => {
   applyAuthState();
 });
 
+updateApiUrlUi();
 applyAuthState();
+
