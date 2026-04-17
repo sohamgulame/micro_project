@@ -50,3 +50,25 @@ class AIService:
             return HealthAnalysis.model_validate_json(response.text)
         except Exception as exc:
             raise AIServiceError("Gemini health analysis returned invalid JSON.") from exc
+
+    @staticmethod
+    def build_fallback_analysis(data: ReadingCreate, reason: str | None = None) -> HealthAnalysis:
+        explanation = (
+            "Automated AI explanation is temporarily unavailable. "
+            f"Latest reading received: SpO2 {data.spo2}, heart rate {data.heart_rate}, "
+            f"temperature {data.temperature} C."
+        )
+        if reason:
+            explanation = f"{explanation} Reason: {reason}"
+
+        return HealthAnalysis(
+            risk_level="Review Needed",
+            conditions=[
+                {
+                    "name": "Manual review suggested",
+                    "confidence": 0.5,
+                }
+            ],
+            explanation=explanation,
+            recommendation="Recheck the sensors and review this reading manually.",
+        )

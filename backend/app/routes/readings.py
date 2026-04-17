@@ -10,7 +10,7 @@ from app.models.reading_schema import (
     ReadingCreate,
     ReadingResponse,
 )
-from app.services.ai_service import AIService
+from app.services.ai_service import AIService, AIServiceError
 from app.services.reading_service import ReadingService
 
 router = APIRouter(prefix="/api/v1", tags=["Readings"])
@@ -39,7 +39,12 @@ def create_reading(
     payload: ReadingCreate, db: Session = Depends(get_db)
 ) -> ReadingAnalysisResponse:
     reading = ReadingService.create_reading(db, payload)
-    analysis = AIService().analyze_health(payload)
+
+    try:
+        analysis = AIService().analyze_health(payload)
+    except AIServiceError as exc:
+        analysis = AIService.build_fallback_analysis(payload, str(exc))
+
     ReadingService.create_prediction(db, reading.id, analysis)
     latest_reading = ReadingService.get_latest_reading(db)
     if latest_reading is None:
