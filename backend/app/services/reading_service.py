@@ -46,16 +46,6 @@ class ReadingService:
 
     @staticmethod
     def get_latest_reading(db: Session) -> Reading | None:
-        reading_with_prediction = (
-            db.query(Reading)
-            .join(Prediction)
-            .options(selectinload(Reading.predictions))
-            .order_by(desc(Reading.timestamp), desc(Reading.id))
-            .first()
-        )
-        if reading_with_prediction is not None:
-            return reading_with_prediction
-
         return (
             db.query(Reading)
             .options(selectinload(Reading.predictions))
