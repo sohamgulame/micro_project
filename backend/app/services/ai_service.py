@@ -1,6 +1,4 @@
-import json
 import os
-import re
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -43,23 +41,15 @@ class AIService:
                 },
             )
         except Exception as exc:
-            raise AIServiceError(f"Gemini health analysis failed: {exc}") from exc
+            raise AIServiceError("Gemini health analysis failed.") from exc
 
-        response_text = (response.text or "").strip()
-        if not response_text:
+        if not response.text:
             raise AIServiceError("Gemini health analysis returned an empty response.")
 
         try:
-            return HealthAnalysis.model_validate_json(response_text)
-        except Exception:
-            try:
-                match = re.search(r"\{.*\}", response_text, re.DOTALL)
-                if match is None:
-                    raise ValueError("No JSON object found in Gemini response.")
-                payload = json.loads(match.group(0))
-                return HealthAnalysis.model_validate(payload)
-            except Exception as exc:
-                raise AIServiceError(f"Gemini health analysis returned invalid JSON: {response_text[:500]}") from exc
+            return HealthAnalysis.model_validate_json(response.text)
+        except Exception as exc:
+            raise AIServiceError("Gemini health analysis returned invalid JSON.") from exc
 
     @staticmethod
     def build_fallback_analysis(data: ReadingCreate, reason: str | None = None) -> HealthAnalysis:
