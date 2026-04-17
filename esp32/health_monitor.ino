@@ -9,8 +9,7 @@
 const char* WIFI_SSID = "TP-Link_8114";
 const char* WIFI_PASSWORD = "17934602";
 
-const char* SERVER_URL = "http://10.200.145.136:8000/api/v1/readings";
-
+const char* SERVER_URL = "http://192.168.0.105:8000/api/v1/readings";
 
 const int ONE_WIRE_BUS = 4;
 const unsigned long POST_INTERVAL_MS = 10000;
@@ -138,6 +137,7 @@ void sendHealthReading() {
 
   HTTPClient http;
   http.begin(SERVER_URL);
+  http.setTimeout(30000);
   http.addHeader("Content-Type", "application/json");
 
   int httpResponseCode = http.POST(payload);
@@ -183,3 +183,4 @@ void loop() {
     sendHealthReading();
   }
 }
+
