@@ -9,7 +9,7 @@
 const char* WIFI_SSID = "TP-Link_8114";
 const char* WIFI_PASSWORD = "17934602";
 
-const char* SERVER_URL = "http://192.168.163.79:8000/api/v1/readings";
+const char* SERVER_URL = "http://192.168.163.79:8001/api/v1/readings";
 
 
 const int ONE_WIRE_BUS = 4;
@@ -183,3 +183,4 @@ void loop() {
     sendHealthReading();
   }
 }
+

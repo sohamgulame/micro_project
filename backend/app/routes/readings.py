@@ -43,6 +43,7 @@ def create_reading(
     try:
         analysis = AIService().analyze_health(payload)
     except AIServiceError as exc:
+        print(f"AIServiceError: {exc}")
         analysis = AIService.build_fallback_analysis(payload, str(exc))
 
     ReadingService.create_prediction(db, reading.id, analysis)
